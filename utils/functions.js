@@ -102,7 +102,7 @@ const extractStateFromResponse = async (url) => {
 };
 
 function saveResult(state) {
-
+console.log("holaaa", state)
   var localitiesID = generarID();
   var streetsID = generarID();
   var numbersID = generarID();
