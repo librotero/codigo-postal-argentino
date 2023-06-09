@@ -2,7 +2,7 @@
 const {saveResult, extractStateFromResponse, obtenerLetraPorProvincia} = require("./utils/functions")
 const stateCode = require("./db/stateCode.json")
 
-
+//function scrape
 exports.scrape = async () => {
   const zipcodes = require("./db/cpa.json");
 
