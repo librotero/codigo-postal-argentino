@@ -2,21 +2,15 @@ const puppeteer = require("puppeteer");
 const fs = require("fs");
 const stateCode = require("../db/stateCode.json")
 
-//estructura csv
-const result = {
-  localities: [],
-  streets: [],
-  numbers: [],
-};
 
 function obtenerLetraPorProvincia(provincia) {
-  const resultado = stateCode.find((objeto) => objeto.provincia.toUpperCase() === provincia.toUpperCase());
-  if (resultado) {
-    return resultado.letra;
-  } else {
-    return null;
-  }
- }
+  var result = stateCode.find((objeto) => objeto.provincia.toUpperCase() === provincia.toUpperCase())
+if (result) {
+  return result.letra
+} else {
+  return null
+}
+}
 const extractStateFromResponse = async (url) => {
   try {
     const browser = await puppeteer.launch();
@@ -43,7 +37,7 @@ const extractStateFromResponse = async (url) => {
         pElement[0]
       );
 
-      const calleRegex = /Avenida(.*?)a todos los números/;
+      const calleRegex = /pertenece a(.*?)a todos los números/;
       const provinciaRegex = /provincia(.*?)Argentina/;
       const ubicacionRegex = /en\s(.*?),/;
       const numerosRegex = /números ([\d]+) a ([\d]+)/;
@@ -83,14 +77,14 @@ const extractStateFromResponse = async (url) => {
             : "impares"
           : null;
 
-      fragmento.state = provincia.toLowerCase();
-      fragmento.nameStreet = calle.toLowerCase();
+      fragmento.state = provincia;
+      fragmento.nameStreet = calle;
       fragmento.from = numerosInicio;
       fragmento.until = numerosFin;
-      fragmento.isOdd = numerosTipo.toLowerCase();
-      fragmento.neighborhood = ubicacion.toLowerCase();
-      fragmento.name = ubicacion.toLowerCase();
-      fragmento.zip = cpa.toLowerCase();
+      fragmento.isOdd = numerosTipo;
+      fragmento.neighborhood = ubicacion;
+      fragmento.name = ubicacion;
+      fragmento.zip = cpa;
     } else {
       console.log("err: no encontramos referencias");
     }
@@ -101,8 +95,14 @@ const extractStateFromResponse = async (url) => {
   return fragmento;
 };
 
+
 function saveResult(state) {
-console.log("holaaa", state)
+  var result = {
+    localities: [],
+    streets: [],
+    numbers: []
+  };
+
   var localitiesID = generarID();
   var streetsID = generarID();
   var numbersID = generarID();
@@ -127,23 +127,25 @@ console.log("holaaa", state)
     isOdd: state.isOdd,
   });
 
-  var csv = 'id,name,zip,state\n';
+  var localitiesCsv = 'id,name,zip,state\n';
   result.localities.forEach(function(locality) {
-    csv += locality.id + ',' + locality.name + ',' + locality.zip + ',' + locality.state + '\n';
+    localitiesCsv += locality.id.toLowerCase() + ',' + locality.name.toLowerCase() + ',' + locality.zip.toLowerCase() + ',' + locality.state.toLowerCase() + '\n';
   });
 
-  csv += '\nstreetId,name,localityId,neighborhood\n';
+  var streetsCsv = 'streetId,name,localityId,neighborhood\n';
   result.streets.forEach(function(street) {
-    csv += street.streetId + ',' + street.name + ',' + street.localityId + ',' + street.neighborhood + '\n';
+    streetsCsv += street.streetId.toLowerCase() + ',' + street.name.toLowerCase() + ',' + street.localityId.toLowerCase() + ',' + street.neighborhood.toLowerCase() + '\n';
   });
 
-  csv += '\nnumberId,streetId,from,until,isOdd\n';
+  var numbersCsv = 'numberId,streetId,from,until,isOdd\n';
   result.numbers.forEach(function(number) {
-    csv += number.numberId + ',' + number.streetId + ',' + number.from + ',' + number.until + ',' + number.isOdd + '\n';
+    numbersCsv += number.numberId.toLowerCase() + ',' + number.streetId.toLowerCase() + ',' + number.from + ',' + number.until + ',' + number.isOdd.toLowerCase() + '\n';
   });
   
-  fs.writeFileSync('db/data.csv', csv);
-  console.log('Archivo CSV guardado correctamente.');
+  fs.appendFileSync('db/localities.csv', localitiesCsv);
+  fs.appendFileSync('db/streets.csv', streetsCsv);
+  fs.appendFileSync('db/numbers.csv', numbersCsv);
+  console.log('Archivos CSV actualizados correctamente.');
 
   return result;
 }

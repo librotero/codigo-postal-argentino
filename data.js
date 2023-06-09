@@ -21,10 +21,11 @@ exports.scrape = async () => {
           console.log( url)
           try {
             const state = await extractStateFromResponse(url);
-            if (state.state === null || state.state === undefined ||state.state ===  "" ||state.state === ",") {
+            if (state.state === null || state.state === undefined ||state.state ===  "" ||state.state === "," || state==undefined) {
               console.log("error no existe este CPA");
+             
             }else{
-              console.log("exitos");
+              console.log("CPA encontrado con exitos");
               saveResult(state, prefijo, suffix, zipcodePrefix);
             }
 
